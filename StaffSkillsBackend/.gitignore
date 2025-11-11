@@ -1,0 +1,33 @@
+# build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+# sqlite database files
+*.db
+*.db-shm
+*.db-wal
+
+# user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# rider / visual studio
+.vs/
+.idea/
+*.swp
+*.swo
+*~
+
+# nuget
+*.nupkg
+*.snupkg
+packages/
+
+# test results
+[Tt]est[Rr]esult*/
