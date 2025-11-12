@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using StaffSkillsBackend.Data;
+using StaffSkillsBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // регистрация контекста БД
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IPersonService, PersonService>();
 
 // добавление контроллеров
 builder.Services.AddControllers();
