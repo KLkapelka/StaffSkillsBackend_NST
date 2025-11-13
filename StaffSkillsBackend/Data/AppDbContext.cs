@@ -25,7 +25,7 @@ public class AppDbContext : DbContext
             .HasForeignKey(s => s.PersonId) // внешний ключ PersonId 
             .OnDelete(DeleteBehavior.Cascade);   // при удалении Person удаляются его Skills
 
-        // Индекс для быстрого поиска навыков по сотруднику
+        // индекс для быстрого поиска навыков по сотруднику
         modelBuilder.Entity<Skill>()
             .HasIndex(s => s.PersonId);
     }

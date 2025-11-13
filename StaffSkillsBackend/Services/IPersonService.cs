@@ -3,43 +3,42 @@ using StaffSkillsBackend.DTOs;
 namespace StaffSkillsBackend.Services;
 
 /// <summary>
-/// Интерфейс для работы с сотрудниками и их навыками
-/// Определяет контракт для бизнес-логики
+/// интерфейс для работы с сотрудниками и их навыками
 /// </summary>
 public interface IPersonService
 {
     /// <summary>
-    /// Получить всех сотрудников с их навыками
+    /// получение всех сотрудников с их навыками
     /// </summary>
-    /// <returns>Список сотрудников</returns>
+    /// <returns>список сотрудников</returns>
     Task<IEnumerable<PersonResponseDto>> GetAllAsync();
 
     /// <summary>
-    /// Получить сотрудника по ID
+    /// получение сотрудника по ID
     /// </summary>
     /// <param name="id">ID сотрудника</param>
-    /// <returns>Сотрудник или null, если не найден</returns>
+    /// <returns>сотрудник или null</returns>
     Task<PersonResponseDto?> GetByIdAsync(long id);
 
     /// <summary>
-    /// Создать нового сотрудника
+    /// создание нового сотрудника
     /// </summary>
-    /// <param name="personDto">Данные сотрудника</param>
-    /// <returns>Созданный сотрудник</returns>
+    /// <param name="personDto">данные сотрудника</param>
+    /// <returns>созданный сотрудник</returns>
     Task<PersonResponseDto> CreateAsync(PersonRequestDto personDto);
 
     /// <summary>
-    /// Обновить данные сотрудника
+    /// обновить данные сотрудника
     /// </summary>
     /// <param name="id">ID сотрудника</param>
-    /// <param name="personDto">Новые данные</param>
-    /// <returns>Обновленный сотрудник или null, если не найден</returns>
+    /// <param name="personDto">новые данные</param>
+    /// <returns>обновленный сотрудник или null</returns>
     Task<PersonResponseDto?> UpdateAsync(long id, PersonRequestDto personDto);
 
     /// <summary>
-    /// Удалить сотрудника
+    /// удалить сотрудника
     /// </summary>
     /// <param name="id">ID сотрудника</param>
-    /// <returns>true если удален, false если не найден</returns>
+    /// <returns>true - удален, false - не найден</returns>
     Task<bool> DeleteAsync(long id);
 }

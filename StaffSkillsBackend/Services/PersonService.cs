@@ -6,8 +6,8 @@ using StaffSkillsBackend.Models;
 namespace StaffSkillsBackend.Services;
 
 /// <summary>
-/// Сервис для работы с сотрудниками
-/// Содержит всю бизнес-логику
+/// сервис для работы с сотрудниками
+/// содержит всю бизнес-логику
 /// </summary>
 public class PersonService : IPersonService
 {
@@ -19,43 +19,43 @@ public class PersonService : IPersonService
     }
 
     /// <summary>
-    /// Получить всех сотрудников
+    /// получение всех сотрудников
     /// </summary>
     public async Task<IEnumerable<PersonResponseDto>> GetAllAsync()
     {
-        // Получаем всех сотрудников вместе с навыками из БД
+        // получение всех сотрудников и навыков из БД
         var persons = await _context.Persons
-            .Include(p => p.Skills) // Подгружаем связанные навыки
+            .Include(p => p.Skills) // подгрузка связных навыков
             .ToListAsync();
 
-        // Преобразуем Entity в DTO
+        // преобразование Entity в DTO
         return persons.Select(p => MapToDto(p));
     }
 
     /// <summary>
-    /// Получить сотрудника по ID
+    /// получение сотрудника по ID
     /// </summary>
     public async Task<PersonResponseDto?> GetByIdAsync(long id)
     {
-        // Ищем сотрудника по ID
+        // поиск сотрудника по ID
         var person = await _context.Persons
             .Include(p => p.Skills)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-        // Если не найден - возвращаем null
+        // не найден - возврат null
         if (person == null)
             return null;
 
-        // Преобразуем в DTO
+        // получение в DTO
         return MapToDto(person);
     }
 
     /// <summary>
-    /// Создать нового сотрудника
+    /// создать нового сотрудника
     /// </summary>
     public async Task<PersonResponseDto> CreateAsync(PersonRequestDto personDto)
     {
-        // Создаём новую Entity из DTO
+        // создать новую Entity из DTO
         var person = new Person
         {
             Name = personDto.Name,
@@ -67,36 +67,36 @@ public class PersonService : IPersonService
             }).ToList()
         };
 
-        // Добавляем в БД
+        // добавление в БД
         _context.Persons.Add(person);
         await _context.SaveChangesAsync();
 
-        // Возвращаем созданного сотрудника как DTO
+        // возврат созданного сотрудника как DTO
         return MapToDto(person);
     }
 
     /// <summary>
-    /// Обновить данные сотрудника
+    /// обновить данные сотрудника
     /// </summary>
     public async Task<PersonResponseDto?> UpdateAsync(long id, PersonRequestDto personDto)
     {
-        // Находим существующего сотрудника
+        // поиск существующего сотрудника
         var person = await _context.Persons
             .Include(p => p.Skills)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-        // Если не найден - возвращаем null
+        // не найден - возврат null
         if (person == null)
             return null;
 
-        // Обновляем основные поля
+        // обновление основных полей
         person.Name = personDto.Name;
         person.DisplayName = personDto.DisplayName;
 
-        // Удаляем старые навыки
+        // удаление старых навыков
         _context.Skills.RemoveRange(person.Skills);
 
-        // Добавляем новые навыки
+        // добавление новых навыков
         person.Skills = personDto.Skills.Select(s => new Skill
         {
             Name = s.Name,
@@ -104,26 +104,26 @@ public class PersonService : IPersonService
             PersonId = person.Id
         }).ToList();
 
-        // Сохраняем изменения
+        // сохранение изменений
         await _context.SaveChangesAsync();
 
-        // Возвращаем обновлённого сотрудника
+        // возврат обновлённого сотрудника
         return MapToDto(person);
     }
 
     /// <summary>
-    /// Удалить сотрудника
+    /// удаление сотрудника
     /// </summary>
     public async Task<bool> DeleteAsync(long id)
     {
-        // Ищем сотрудника
+        // поиск сотрудника
         var person = await _context.Persons.FindAsync(id);
 
-        // Если не найден - возвращаем false
+        // не найден - false
         if (person == null)
             return false;
 
-        // Удаляем (навыки удалятся автоматически из-за Cascade Delete)
+        // удаление. Навыки удалятся автоматически из-за Cascade Delete
         _context.Persons.Remove(person);
         await _context.SaveChangesAsync();
 
@@ -131,7 +131,7 @@ public class PersonService : IPersonService
     }
 
     /// <summary>
-    /// Вспомогательный метод для преобразования Entity в DTO
+    /// вспомогательный метод для преобразования Entity в DTO
     /// </summary>
     private static PersonResponseDto MapToDto(Person person)
     {

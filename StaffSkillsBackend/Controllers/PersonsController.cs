@@ -5,23 +5,25 @@ using StaffSkillsBackend.Services;
 namespace StaffSkillsBackend.Controllers;
 
 /// <summary>
-/// Контроллер для работы с сотрудниками
-/// Теперь использует PersonService вместо прямой работы с БД
+/// контроллер для работы с сотрудниками
+/// использование PersonService для бизнес-логики вместо прямой работы с БД
 /// </summary>
-[ApiController]
-[Route("api/v1/[controller]")]
+[ApiController] // автоматическая валидация
+[Route("api/v1/[controller]")] // определение маршрута /api/v1/persons
 public class PersonsController : ControllerBase
 {
     private readonly IPersonService _personService;
 
-    // Внедряем сервис через конструктор
+    /// <summary>
+    /// инициализация нового экземпляра контроллера PersonsController
+    /// </summary>
     public PersonsController(IPersonService personService)
     {
         _personService = personService;
     }
-
+    
     /// <summary>
-    /// Получить всех сотрудников
+    /// получение списока всех сотрудников
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PersonResponseDto>>> GetAll()
@@ -29,9 +31,9 @@ public class PersonsController : ControllerBase
         var persons = await _personService.GetAllAsync();
         return Ok(persons);
     }
-
+    
     /// <summary>
-    /// Получить сотрудника по ID
+    /// получение сотрудника по идентификатору
     /// </summary>
     [HttpGet("{id}")]
     public async Task<ActionResult<PersonResponseDto>> GetById(long id)
@@ -45,7 +47,7 @@ public class PersonsController : ControllerBase
     }
 
     /// <summary>
-    /// Создать нового сотрудника
+    /// создание нового сотрудника
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<PersonResponseDto>> Create([FromBody] PersonRequestDto personDto)
@@ -55,7 +57,7 @@ public class PersonsController : ControllerBase
     }
 
     /// <summary>
-    /// Обновить данные сотрудника
+    /// обновить данные сотрудника
     /// </summary>
     [HttpPut("{id}")]
     public async Task<ActionResult<PersonResponseDto>> Update(long id, [FromBody] PersonRequestDto personDto)
@@ -69,7 +71,7 @@ public class PersonsController : ControllerBase
     }
 
     /// <summary>
-    /// Удалить сотрудника
+    /// удалить сотрудника
     /// </summary>
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(long id)
