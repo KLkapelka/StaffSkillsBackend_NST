@@ -7,38 +7,18 @@ namespace StaffSkillsBackend.Services;
 /// </summary>
 public interface IPersonService
 {
-    /// <summary>
-    /// получение всех сотрудников с их навыками
-    /// </summary>
-    /// <returns>список сотрудников</returns>
+    // получение всех сотрудников
     Task<IEnumerable<PersonResponseDto>> GetAllAsync();
-
-    /// <summary>
-    /// получение сотрудника по ID
-    /// </summary>
-    /// <param name="id">ID сотрудника</param>
-    /// <returns>сотрудник или null</returns>
+    
+    // получение одного сотрудника по номеру
     Task<PersonResponseDto?> GetByIdAsync(long id);
-
-    /// <summary>
-    /// создание нового сотрудника
-    /// </summary>
-    /// <param name="personDto">данные сотрудника</param>
-    /// <returns>созданный сотрудник</returns>
+    
+    // создание нового сотрудника
     Task<PersonResponseDto> CreateAsync(PersonRequestDto personDto);
 
-    /// <summary>
-    /// обновить данные сотрудника
-    /// </summary>
-    /// <param name="id">ID сотрудника</param>
-    /// <param name="personDto">новые данные</param>
-    /// <returns>обновленный сотрудник или null</returns>
+    // обновление данных сотрудника
     Task<PersonResponseDto?> UpdateAsync(long id, PersonRequestDto personDto);
 
-    /// <summary>
-    /// удалить сотрудника
-    /// </summary>
-    /// <param name="id">ID сотрудника</param>
-    /// <returns>true - удален, false - не найден</returns>
+    // удаление сотрудника
     Task<bool> DeleteAsync(long id);
 }

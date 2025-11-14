@@ -18,66 +18,123 @@ public class PersonService : IPersonService
         _context = context;
     }
 
-    /// <summary>
-    /// получение всех сотрудников
-    /// </summary>
+    // ПОЛУЧЕНИЕ ВСЕХ СОТРУДНИКОВ
     public async Task<IEnumerable<PersonResponseDto>> GetAllAsync()
     {
-        // получение всех сотрудников и навыков из БД
+        // получение всех сотрудников из БД + навыками
         var persons = await _context.Persons
-            .Include(p => p.Skills) // подгрузка связных навыков
+            .Include(p => p.Skills) // загрузка навыков
             .ToListAsync();
 
-        // преобразование Entity в DTO
-        return persons.Select(p => MapToDto(p));
+        // преобразование сотрудников в DTO
+        var result = new List<PersonResponseDto>();
+        foreach (var person in persons)
+        {
+            var dto = new PersonResponseDto
+            {
+                Id = person.Id,
+                Name = person.Name,
+                DisplayName = person.DisplayName,
+                Skills = new List<SkillDto>()
+            };
+
+            // добавление навыков
+            foreach (var skill in person.Skills)
+            {
+                dto.Skills.Add(new SkillDto
+                {
+                    Name = skill.Name,
+                    Level = skill.Level
+                });
+            }
+
+            result.Add(dto);
+        }
+
+        return result;
     }
 
-    /// <summary>
-    /// получение сотрудника по ID
-    /// </summary>
+    // ПОЛУЧЕНИЕ ОДНОГО СОТРУДНИКА ПО ID
     public async Task<PersonResponseDto?> GetByIdAsync(long id)
     {
-        // поиск сотрудника по ID
+        // поиск сотрудника в БД
         var person = await _context.Persons
             .Include(p => p.Skills)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-        // не найден - возврат null
+        // не найден - null
         if (person == null)
             return null;
 
-        // получение в DTO
-        return MapToDto(person);
+        // преобразование в DTO
+        var dto = new PersonResponseDto
+        {
+            Id = person.Id,
+            Name = person.Name,
+            DisplayName = person.DisplayName,
+            Skills = new List<SkillDto>()
+        };
+
+        // добавление навыков
+        foreach (var skill in person.Skills)
+        {
+            dto.Skills.Add(new SkillDto
+            {
+                Name = skill.Name,
+                Level = skill.Level
+            });
+        }
+
+        return dto;
     }
 
-    /// <summary>
-    /// создать нового сотрудника
-    /// </summary>
+    // СОЗДАНИЕ НОВОГО СОТРУДНИКА
     public async Task<PersonResponseDto> CreateAsync(PersonRequestDto personDto)
     {
-        // создать новую Entity из DTO
+        // создание объекта Person
         var person = new Person
         {
             Name = personDto.Name,
             DisplayName = personDto.DisplayName,
-            Skills = personDto.Skills.Select(s => new Skill
-            {
-                Name = s.Name,
-                Level = s.Level
-            }).ToList()
+            Skills = new List<Skill>()
         };
 
-        // добавление в БД
+        // добавление навыков
+        foreach (var skillDto in personDto.Skills)
+        {
+            person.Skills.Add(new Skill
+            {
+                Name = skillDto.Name,
+                Level = skillDto.Level
+            });
+        }
+
+        // сохранение в БД
         _context.Persons.Add(person);
         await _context.SaveChangesAsync();
 
         // возврат созданного сотрудника как DTO
-        return MapToDto(person);
+        var result = new PersonResponseDto
+        {
+            Id = person.Id,
+            Name = person.Name,
+            DisplayName = person.DisplayName,
+            Skills = new List<SkillDto>()
+        };
+
+        foreach (var skill in person.Skills)
+        {
+            result.Skills.Add(new SkillDto
+            {
+                Name = skill.Name,
+                Level = skill.Level
+            });
+        }
+
+        return result;
     }
 
-    /// <summary>
-    /// обновить данные сотрудника
-    /// </summary>
+    // ОБНОВЛЕНИЕ ДАННЫХ СОТРУДНИКА
     public async Task<PersonResponseDto?> UpdateAsync(long id, PersonRequestDto personDto)
     {
         // поиск существующего сотрудника
@@ -85,35 +142,54 @@ public class PersonService : IPersonService
             .Include(p => p.Skills)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-        // не найден - возврат null
+        // не найден - null
         if (person == null)
             return null;
 
-        // обновление основных полей
+        // обновление данных
         person.Name = personDto.Name;
         person.DisplayName = personDto.DisplayName;
 
-        // удаление старых навыков
-        _context.Skills.RemoveRange(person.Skills);
+        // удаление старые навыков
+        person.Skills.Clear();
+        _context.Skills.RemoveRange(_context.Skills.Where(s => s.PersonId == id));
 
         // добавление новых навыков
-        person.Skills = personDto.Skills.Select(s => new Skill
+        foreach (var skillDto in personDto.Skills)
         {
-            Name = s.Name,
-            Level = s.Level,
-            PersonId = person.Id
-        }).ToList();
+            person.Skills.Add(new Skill
+            {
+                Name = skillDto.Name,
+                Level = skillDto.Level,
+                PersonId = id
+            });
+        }
 
         // сохранение изменений
         await _context.SaveChangesAsync();
 
         // возврат обновлённого сотрудника
-        return MapToDto(person);
+        var result = new PersonResponseDto
+        {
+            Id = person.Id,
+            Name = person.Name,
+            DisplayName = person.DisplayName,
+            Skills = new List<SkillDto>()
+        };
+
+        foreach (var skill in person.Skills)
+        {
+            result.Skills.Add(new SkillDto
+            {
+                Name = skill.Name,
+                Level = skill.Level
+            });
+        }
+
+        return result;
     }
 
-    /// <summary>
-    /// удаление сотрудника
-    /// </summary>
+    // УДАЛЕНИЕ СОТРУДНИКА 
     public async Task<bool> DeleteAsync(long id)
     {
         // поиск сотрудника
@@ -128,23 +204,5 @@ public class PersonService : IPersonService
         await _context.SaveChangesAsync();
 
         return true;
-    }
-
-    /// <summary>
-    /// вспомогательный метод для преобразования Entity в DTO
-    /// </summary>
-    private static PersonResponseDto MapToDto(Person person)
-    {
-        return new PersonResponseDto
-        {
-            Id = person.Id,
-            Name = person.Name,
-            DisplayName = person.DisplayName,
-            Skills = person.Skills.Select(s => new SkillDto
-            {
-                Name = s.Name,
-                Level = s.Level
-            }).ToList()
-        };
     }
 }
